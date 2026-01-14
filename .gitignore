@@ -1,5 +1,7 @@
 __pycache__
 *.pyc
 .venv/
-data/raw
-data/processed
+venv_ml/
+
+data/raw/
+data/processed/

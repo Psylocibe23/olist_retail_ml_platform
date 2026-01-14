@@ -22,11 +22,17 @@
 
 
 - customers["customer_state"].value_counts().head()
+
 customer_state
+
 SP    41746
+
 RJ    12852
+
 MG    11635
+
 RS     5466
+
 PR     5045
 
 - customers['customer_city'].value_counts().head()

@@ -23,22 +23,26 @@
 
 - customers["customer_state"].value_counts().head()
 
-customer_state
-
-SP    41746
-
-RJ    12852
-
-MG    11635
-
-RS     5466
-
-PR     5045
+| customer_state | count |
+|----------------|------:|
+| SP             | 41746 |
+| RJ             | 12852 |
+| MG             | 11635 |
+| RS             |  5466 |
+| PR             |  5045 |
 
 - customers['customer_city'].value_counts().head()
-customer_city
-sao paulo         15540
-rio de janeiro     6882
-belo horizonte     2773
-brasilia           2131
-curitiba           1521
+
+| customer_city  | count |
+|----------------|------:|
+| sao paulo      | 15540 |
+| rio de janeiro | 6882  |
+| belo horizonte | 2773  |
+| brasilia       | 2131  |
+| curitiba       | 1521  |
+
+         
+     
+     
+          
+           

@@ -227,6 +227,56 @@ dataset containing reviews information on orders
 - Many reviews have no text:
   - `review_comment_title` is missing for ~88% of rows
   - `review_comment_message` is missing for ~59% of rows
-  For NLP tasks we will likely filter to rows with non-null `review_comment_message`
+  - For NLP tasks we will likely filter to rows with non-null `review_comment_message`
 - `review_creation_date` and `review_answer_timestamp` will be converted to proper datetime columns
 - Review scores are skewed positive (most are 4–5), which matters for modeling (class imbalance)
+
+
+# olist_orders_dataset.csv ('orders')
+dataset containing orders informations (status, delivery time, client,...)
+- **Grain**: one row per order id
+- **Shape**: (99441, 8)
+- **Approx Memory**: ~6.1 MB
+
+## Keys and cardinalities
+- primary key: `order_id`
+- `order_id`:
+    - `is_unique = True`
+    - `num_unique = 99441`
+- `customer_id`:
+    - `is_unique = True`
+    - `num_unique = 99441`
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `order_id`                   | object | 0.0    |    99441  | ID identifying an order               |
+| `customer_id`                | object | 0.0    |    99441  | ID identifying a customer             |
+| `order_status`               | object | 0.0    |    8      | order status (delivered, invoiced, canceled, ...) |
+| `order_purchase_timestamp`   | object | 0.0    |    98875  | purchase timestamp (yyyy-mm-dd HH:MM:SS) |
+| `order_approved_at`          | object | 0.16   |    90733  | approving timestamp (yyyy-mm-dd HH:MM:SS) |
+| `order_delivered_carrier_date` | object | 1.8  |    81018  | timestamp of delivering for shipment (yyyy-mm-dd HH:MM:SS) |
+| `order_delivered_customer_date`| object | 2.98 |    95664  | delivery timestamp (yyyy-mm-dd HH:MM:SS) |
+| `order_estimated_delivery_date`| object | 0.0  |    459    | estimated delivery date (yyyy-mm-dd 00:00:00) |
+
+- order_status distribution
+
+| order_status | count |
+|--------------|------:|
+| delivered    | 96478 |
+| shipped      | 1107  |
+| canceled     | 625   |
+| unavailable  | 609   |
+| invoiced     | 314   |
+| processing   | 301   |
+| created      | 5     |
+| approved     | 2     |
+
+## Notes
+- all `order_purchase_timestamp`, `order_approved_at`, `order_delivered_carrier_date`, `order_delivered_customer_date`, `order_estimated_delivery_date` will be converted to datetime
+- `order_id` is the true primary key of this table and will be used to join with items, payments, and reviews
+- `customer_id` is unique in this file and acts as a foreign key to the `customers` table
+- `order_status` is heavily skewed towards `delivered` (most orders). Non-delivered statuses
+  (canceled, unavailable, etc.) usually have missing delivery timestamps and may be excluded
+  from delivery-time analyses and forecasting targets

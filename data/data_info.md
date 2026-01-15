@@ -331,3 +331,51 @@ dataset containing information about products (category, wight, description, ...
   for modeling we may:
   - group rare categories,
   - or use target encoding / embeddings rather than one-hot encoding
+
+
+# olist_sellers_dataset.csv ('sellers')
+dataset containing sellers information (id, zip prefix, city, state)
+- **Grain**: one row per seller id
+- **Shape**: (3095, 4)
+- **Approx Memory**: ~0.1 MB
+
+## Keys and cardinalities
+- primary key: `seller_id`
+- `seller_id`:
+    - `is_unique = True`
+    - `num_unique = 3095`
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `seller_id`                  | object | 0.0    |    3095   | ID identifying sellers (links to `items.seller_id`) |
+| `seller_zip_code_prefix`     | int64  | 0.0    |    2246   | ZIP code prefix of seller location    |
+| `seller_city`                | object | 0.0    |    611    | Seller city (Brazilian Portuguese, similar issues as `customer_city`)     |
+| `seller_state`               | object | 0.0    |    23     | State abbreviation (SP, RJ, MG, …); subset of the 27 Brazilian states |
+
+- sellers['seller_state'].value_counts().head()
+
+| seller_state   | count |
+|----------------|------:|
+| SP             | 1849  |
+| PR             | 349   |
+| MG             | 244   |
+| SC             |  190  |
+| RJ             |  171  |
+
+- sellers['seller_city'].value_counts().head()
+
+| seller_city    | count |
+|----------------|------:|
+| sao paulo      | 694   |
+| curitiba       | 127   |
+| rio de janeiro | 96    |
+| belo horizonte | 68    | 
+| ribeirao preto | 52    | 
+
+## Notes
+- `seller_id` is the primary key and is used in `items` to link each order item to a seller
+- `seller_zip_code_prefix` can be joined with `geolocation.geolocation_zip_code_prefix` to get lat/long for sellers
+- Only **23** of the **27** Brazilian states present in `customers` / `geolocation` appear for sellers: some states have buyers but no sellers in this dataset
+- City names will have the same normalization issues as `customer_city` / `geolocation_city` (accents, casing); we will normalize them when needed

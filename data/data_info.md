@@ -166,10 +166,10 @@ dataset containing information aboutorders payments
 
 | payment_type | count |
 |--------------|------:|
-| credit_card  | 76,795 |
-| boleto       | 19,784 |
-| voucher      | 5,775  |
-| debit_card   | 1,529  |
+| credit_card  | 76795 |
+| boleto       | 19784 |
+| voucher      | 5775  |
+| debit_card   | 1529  |
 | not_defined  | 3      |
 
 ## Notes
@@ -179,3 +179,54 @@ dataset containing information aboutorders payments
 - This table will be joined with `orders` using `order_id` and typically aggregated to the order level in the ETL
 - `payment_type = "not_defined"` appears very rarely (3 rows)
 
+
+# olist_order_reviews_dataset.csv ('reviews')
+dataset containing reviews information on orders
+- **Grain (intended)**: one review per order
+- **Grain (observed)**: one review record per row; some `review_id` and `order_id` appear more than once due to duplicated records in the public dataset
+- **Shape**: (99224, 7)
+- **Approx Memory**: ~5.3 MB
+
+## Keys and cardinalities
+- No clean primary key in the raw data:
+  - `review_id` is intended to be a unique review identifier but appears duplicated
+  - The pair (`order_id`, `review_id`) is candidate key (no duplicates)
+- `order_id`:
+    - `is_unique = False`
+    - `num_unique = 98673`
+- `review_id`:
+    - `is_unique = False`
+    - `num_unique = 98410`
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `review_id`                  | object | 0.0    |    98410  | ID indentifying reviews               |
+| `order_id`                   | object | 0.0    |    98673  | ID identifying orders                 |
+| `review_score`               | int64  | 0.0    |    5      | review score 1 - 5                    |
+| `review_comment_title`       | object | 88.3   |    4527   | review's title                        |
+| `review_comment_message`     | object | 58.7   |    36159  | review's comment message              |
+| `review_creation_date`       | object | 0.0    |    636    | review's date (yyyy-mm-dd 00:00:00)   |
+| `review_answer_timestamp`    | object | 0.0    |    98248  | review's answer timestamp (yyyy-mm-dd HH:MM:SS) |
+
+- review_score distribution
+
+| review_score | count |
+|--------------|------:|
+| 5            | 57328 |
+| 4            | 19142 |
+| 1            | 11424 |
+| 3            | 8179  |
+| 2            | 3151  |
+
+## Notes
+- Some `review_id` values are associated with more than one `order_id`, with all other fields identical:
+  - we will treat these as duplicated records and define a cleaning rule
+    (e.g. keep a single record per `review_id` or per `order_id`)
+- Many reviews have no text:
+  - `review_comment_title` is missing for ~88% of rows
+  - `review_comment_message` is missing for ~59% of rows
+  For NLP tasks we will likely filter to rows with non-null `review_comment_message`
+- `review_creation_date` and `review_answer_timestamp` will be converted to proper datetime columns
+- Review scores are skewed positive (most are 4–5), which matters for modeling (class imbalance)

@@ -98,8 +98,8 @@ A sample of raw latitude/longitude points grouped by ZIP code prefix, city and s
 - `geolocation` has many more rows because it stores multiple coordinate points per ZIP prefix and city; for modeling we will aggregate to one row per ZIP prefix.
 
 
-## olist_order_items_dataset.csv ('items')
-dataset containing information about the items orders.
+# olist_order_items_dataset.csv ('items')
+dataset containing information about the items orders
 - **Grain**: one row per item line in an order
 - **Shape**: (112650, 7)
 - **Approx Memory**: ~6 MB
@@ -135,4 +135,47 @@ dataset containing information about the items orders.
 - Across tables (e.g. joining with `orders`, `reviews`, `payments`), we will link on `order_id` only (order-level key)
 - We will convert `shipping_limit_date` to a proper datetime when loading into our modeling/ETL pipeline
 - Aggregating `price` and `freight_value` over all items in an order gives total order revenue and shipping cost
+
+
+# olist_order_payments_dataset.csv ('payments')
+dataset containing information aboutorders payments
+- **Grain**: One row per payment event for an order
+- **Shape**: (103886, 5)
+- **Approx Memory**: ~4 MB
+     
+## Keys and cardinalities
+- primary key (composite): (`order_id`, `payment_sequential`)
+- `order_id`:
+    - `is_unique = False`
+    - `num_unique = 99440`
+- `payment_sequential`:
+    - `num_unique = 29`
+    - sequence number of the payment record within the order (1, 2, …)
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `order_id`                   | object | 0.0    |    99440  | ID indentifying orders                |
+| `payment_sequential`         | int64  | 0.0    |    29     | sequence of this payment record for the order (1 = first payment, …)  |
+| `payment_type`               | object | 0.0    |    5      | category identifying the payment method (credit_card, voucher, ...) |
+| `payment_installments`       | int64  | 0.0    |    24     | number of installments for this payment |
+| `payment_value`              | float64| 0.0    |    29077  | amount payed in R$                    |
+
+- payment_type distribution
+
+| payment_type | count |
+|--------------|------:|
+| credit_card  | 76,795 |
+| boleto       | 19,784 |
+| voucher      | 5,775  |
+| debit_card   | 1,529  |
+| not_defined  | 3      |
+
+## Notes
+- Most orders have `payment_sequential = 1` only; some have multiple payment rows (split payments)
+- Total amount paid per order is obtained by summing `payment_value` over all rows with the same `order_id`
+- `payment_installments` is the number of installments for a given payment, **not** the count of payment rows.
+- This table will be joined with `orders` using `order_id` and typically aggregated to the order level in the ETL
+- `payment_type = "not_defined"` appears very rarely (3 rows)
 

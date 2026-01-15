@@ -246,6 +246,7 @@ dataset containing orders informations (status, delivery time, client,...)
 - `customer_id`:
     - `is_unique = True`
     - `num_unique = 99441`
+    - foreign key to `customers` table
 
 ## Columns
 
@@ -280,3 +281,53 @@ dataset containing orders informations (status, delivery time, client,...)
 - `order_status` is heavily skewed towards `delivered` (most orders). Non-delivered statuses
   (canceled, unavailable, etc.) usually have missing delivery timestamps and may be excluded
   from delivery-time analyses and forecasting targets
+
+
+# olist_products_dataset.csv ('products')
+dataset containing information about products (category, wight, description, ...)
+- **Grain**: one row per product id
+- **Shape**: (32951, 9)
+- **Approx Memory**: ~2.3 MB
+
+## Keys and cardinalities
+- primary key: 
+- `product_id`:
+    - `is_unique = True`
+    - `num_unique = 32951`
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `product_id`                 | object | 0.0    |    32951  | ID identifying products               |
+| `product_category_name`      | object | 1.8    |    73     | name of the product's category (perfumaria, artes, ...) |
+| `product_name_lenght`        | float64| 1.8    |    66     | length of product name                |
+| `product_description_lenght` | float64| 1.8    |    2960   | length of product description         |
+| `product_photos_qty`         | float64| 1.8    |    19     | how many photo of the product are visible on product page |
+| `product_weight_g`           | float64| 0.0  |    2204   | product weight in grams               |
+| `product_length_cm`          | float64| 0.0  |    99     | product length in centimeters         |
+| `product_height_cm`          | float64| 0.0  |    102    | product height in centimeters         |
+| `product_width_cm`           | float64| 0.0  |    95     | product width in centimeters          |
+
+- products['product_category_name'].value_counts().head()
+
+| product_category_name | count |
+|-----------------------|------:|
+| cama_mesa_banho       | 3029  |
+| esporte_lazer         | 2867  |
+| moveis_decoracao      | 2657  |
+| beleza_saude          | 2444  |
+| utilidades_domesticas | 2335  |
+
+## Notes
+- `product_id` is the primary key and links to `items.product_id`
+- `product_category_name`, `product_name_lenght`, `product_description_lenght`,
+  and `product_photos_qty` have ~1.9% missing values (610 products)
+- `product_weight_g`, `product_length_cm`, `product_height_cm`, and
+  `product_width_cm` have only 2 missing values each (~0.006%)
+- The “length” and “qty” fields are counts but stored as floats due to missing values;
+  they can be safely treated as integers after appropriate imputation
+- `product_category_name` is in Portuguese and relatively high-cardinality (73 categories);
+  for modeling we may:
+  - group rare categories,
+  - or use target encoding / embeddings rather than one-hot encoding

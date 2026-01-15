@@ -379,3 +379,25 @@ dataset containing sellers information (id, zip prefix, city, state)
 - `seller_zip_code_prefix` can be joined with `geolocation.geolocation_zip_code_prefix` to get lat/long for sellers
 - Only **23** of the **27** Brazilian states present in `customers` / `geolocation` appear for sellers: some states have buyers but no sellers in this dataset
 - City names will have the same normalization issues as `customer_city` / `geolocation_city` (accents, casing); we will normalize them when needed
+
+
+# olist_category_name_translation.csv ('categories')
+Dataset containing the names for product categories in Portuguese and English
+- **Grain**: one row per category
+- **Shape**: (71, 2)
+- **Approx Memory**: ~1.2 KB
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `product_category_name`      | object | 0.0    |    71     | product category name in Portuguese   |
+| `product_category_name_english` | object | 0.0 |    71     | product category name in English      |
+
+
+## Notes
+- This table provides a 1–1 mapping between Portuguese and English category names.
+- `product_category_name` links to `products.product_category_name`
+- The `products` table has 73 distinct categories, while this mapping file has 71:
+  a small number of categories in `products` have no English translation here and
+  will need special handling (e.g. keep original name or map to `"unknown"`)

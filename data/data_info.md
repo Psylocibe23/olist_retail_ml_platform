@@ -290,7 +290,7 @@ dataset containing information about products (category, wight, description, ...
 - **Approx Memory**: ~2.3 MB
 
 ## Keys and cardinalities
-- primary key: 
+- primary key: `product_id`
 - `product_id`:
     - `is_unique = True`
     - `num_unique = 32951`
@@ -304,10 +304,10 @@ dataset containing information about products (category, wight, description, ...
 | `product_name_lenght`        | float64| 1.8    |    66     | length of product name                |
 | `product_description_lenght` | float64| 1.8    |    2960   | length of product description         |
 | `product_photos_qty`         | float64| 1.8    |    19     | how many photo of the product are visible on product page |
-| `product_weight_g`           | float64| 0.0  |    2204   | product weight in grams               |
-| `product_length_cm`          | float64| 0.0  |    99     | product length in centimeters         |
-| `product_height_cm`          | float64| 0.0  |    102    | product height in centimeters         |
-| `product_width_cm`           | float64| 0.0  |    95     | product width in centimeters          |
+| `product_weight_g`           | float64| 0.01  |    2204   | product weight in grams               |
+| `product_length_cm`          | float64| 0.01  |    99     | product length in centimeters         |
+| `product_height_cm`          | float64| 0.01  |    102    | product height in centimeters         |
+| `product_width_cm`           | float64| 0.01  |    95     | product width in centimeters          |
 
 - products['product_category_name'].value_counts().head()
 

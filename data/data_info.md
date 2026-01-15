@@ -48,7 +48,7 @@
          
 
 # olist_geolocation_dataset.csv ('geolocation')
-“A sample of raw latitude/longitude points grouped by ZIP code prefix, city and state.”
+A sample of raw latitude/longitude points grouped by ZIP code prefix, city and state.
 - **Grain**: one row represents a point on the map
 - **Shape**: (1000163, 5)
 - **Approx Memory**: ~38.2 MB
@@ -96,3 +96,43 @@
   - normalize city names to lowercase and remove accents before comparison/join;
   - primarily rely on `*_zip_code_prefix` and state for geographic joins.
 - `geolocation` has many more rows because it stores multiple coordinate points per ZIP prefix and city; for modeling we will aggregate to one row per ZIP prefix.
+
+
+## olist_order_items_dataset.csv ('items')
+dataset containing information about the items orders.
+- **Grain**: one row per item line in an order
+- **Shape**: (112650, 7)
+- **Approx Memory**: ~6 MB
+     
+## Keys and cardinalities
+- primary key (composite): (`order_id`, `order_item_id`)
+- `order_id`:
+    - `is_unique = False`
+    - `num_unique = 98666`
+- `order_item_id`:
+    - `num_unique = 21`
+    - line index within each order (starts at 1 for each order)
+- `product_id`:
+    - `num_unique = 32,951`
+    - foreign key to `products` table
+
+
+## Columns
+
+| Column                       | Dtype  | Null % | #Distinct | Notes                                 |
+|------------------------------|--------|--------|----------:|---------------------------------------|
+| `order_id`                   | object | 0.0    |    98666  | ID indentifying orders                |
+| `order_item_id`              | int64  | 0.0    |    21     | identifies the line number of the item in a given order  |
+| `product_id`                 | object | 0.0    |    32951  | ID identifying the product sold       |
+| `seller_id`                  | object | 0.0    |    3095   | ID of the seller                      |
+| `shipping_limit_date`        | object | 0.0    |    93318  | shipping deadline (yyyy-mm-dd HH:MM:SS) |
+| `price`                      | float64| 0.0    |    5968   | price of item sold in R$              |
+| `freight_value`              | float64| 0.0    |    6999   | shipment cost                         |
+
+## Notes
+- Multiple rows share the same `order_id`: one per item line
+- The composite key (`order_id`, `order_item_id`) uniquely identifies an item line within this table
+- Across tables (e.g. joining with `orders`, `reviews`, `payments`), we will link on `order_id` only (order-level key)
+- We will convert `shipping_limit_date` to a proper datetime when loading into our modeling/ETL pipeline
+- Aggregating `price` and `freight_value` over all items in an order gives total order revenue and shipping cost
+

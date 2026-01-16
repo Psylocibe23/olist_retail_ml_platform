@@ -434,3 +434,11 @@ Dataset containing the names for product categories in Portuguese and English
 ![Olist schema diagram](../docs/olist_schema.png)
 
 *Figure 1 – ER diagram for the Olist dataset (source: “Brazilian E-Commerce Public Dataset by Olist” on Kaggle).*
+
+---
+
+### Modeling targets 
+
+- For the forecasting part, our main targets will be **daily_total_revenue** and **daily_order_count**, obtained by aggregating raw events from `orders` + `payments` at the **daily level** (and typically restricted to orders with `order_status = 'delivered'`)
+- For the NLP part, the target will be the **review_score** (1–5) from `reviews`, possibly mapped to sentiment classes (negative / neutral / positive), using one row per cleaned review with non-null `review_comment_message`
+- These targets are not present as-is in the raw CSVs and will be created explicitly during the ETL 

@@ -175,7 +175,7 @@ dataset containing information aboutorders payments
 ## Notes
 - Most orders have `payment_sequential = 1` only; some have multiple payment rows (split payments)
 - Total amount paid per order is obtained by summing `payment_value` over all rows with the same `order_id`
-- `payment_installments` is the number of installments for a given payment, **not** the count of payment rows.
+- `payment_installments` is the number of installments for a given payment, **not** the count of payment rows
 - This table will be joined with `orders` using `order_id` and typically aggregated to the order level in the ETL
 - `payment_type = "not_defined"` appears very rarely (3 rows)
 
@@ -401,3 +401,25 @@ Dataset containing the names for product categories in Portuguese and English
 - The `products` table has 73 distinct categories, while this mapping file has 71:
   a small number of categories in `products` have no English translation here and
   will need special handling (e.g. keep original name or map to `"unknown"`)
+
+
+# Relationship overview
+
+- **Main table**: `orders`
+
+- **Customer side**:
+    - `customers` &harr; `orders` via (`customer_id`)
+    - `customers` &harr; `geolocation` via (`*_zip_code_prefix`) 
+
+- **Items/Products/Sellers**:
+    - `items` &harr; `orders` via (`order_id`)
+    - `items` &harr; `products` via (`product_id`)
+    - `items` &harr; `sellers` via (`seller_id`)
+    - `products` &harr; `categories` via (`prduct_category_name`)
+    - `sellers` &harr; `geolocation` via (`*_zip_code_prefix`)
+
+- **Payments and Reviews**:
+    - `payments` &harr; `orders` via (`order_id`)
+    - `reviews` &harr; `orders` via (`order_id`)
+
+![Olist schema diagram](../docs/olist_schema.png)

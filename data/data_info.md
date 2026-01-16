@@ -46,6 +46,7 @@
 - `customer_unique_id` will be useful for customer-level features (e.g. number of orders per person).
 - For modeling, we’ll likely aggregate by `customer_unique_id`, not `customer_id`.
          
+---
 
 # olist_geolocation_dataset.csv ('geolocation')
 A sample of raw latitude/longitude points grouped by ZIP code prefix, city and state.
@@ -97,6 +98,7 @@ A sample of raw latitude/longitude points grouped by ZIP code prefix, city and s
   - primarily rely on `*_zip_code_prefix` and state for geographic joins.
 - `geolocation` has many more rows because it stores multiple coordinate points per ZIP prefix and city; for modeling we will aggregate to one row per ZIP prefix.
 
+---
 
 # olist_order_items_dataset.csv ('items')
 dataset containing information about the items orders
@@ -121,7 +123,7 @@ dataset containing information about the items orders
 
 | Column                       | Dtype  | Null % | #Distinct | Notes                                 |
 |------------------------------|--------|--------|----------:|---------------------------------------|
-| `order_id`                   | object | 0.0    |    98666  | ID indentifying orders                |
+| `order_id`                   | object | 0.0    |    98666  | ID identifying orders                |
 | `order_item_id`              | int64  | 0.0    |    21     | identifies the line number of the item in a given order  |
 | `product_id`                 | object | 0.0    |    32951  | ID identifying the product sold       |
 | `seller_id`                  | object | 0.0    |    3095   | ID of the seller                      |
@@ -136,9 +138,10 @@ dataset containing information about the items orders
 - We will convert `shipping_limit_date` to a proper datetime when loading into our modeling/ETL pipeline
 - Aggregating `price` and `freight_value` over all items in an order gives total order revenue and shipping cost
 
+---
 
 # olist_order_payments_dataset.csv ('payments')
-dataset containing information aboutorders payments
+dataset containing information about orders payments
 - **Grain**: One row per payment event for an order
 - **Shape**: (103886, 5)
 - **Approx Memory**: ~4 MB
@@ -179,6 +182,7 @@ dataset containing information aboutorders payments
 - This table will be joined with `orders` using `order_id` and typically aggregated to the order level in the ETL
 - `payment_type = "not_defined"` appears very rarely (3 rows)
 
+---
 
 # olist_order_reviews_dataset.csv ('reviews')
 dataset containing reviews information on orders
@@ -231,6 +235,7 @@ dataset containing reviews information on orders
 - `review_creation_date` and `review_answer_timestamp` will be converted to proper datetime columns
 - Review scores are skewed positive (most are 4–5), which matters for modeling (class imbalance)
 
+---
 
 # olist_orders_dataset.csv ('orders')
 dataset containing orders informations (status, delivery time, client,...)
@@ -282,9 +287,10 @@ dataset containing orders informations (status, delivery time, client,...)
   (canceled, unavailable, etc.) usually have missing delivery timestamps and may be excluded
   from delivery-time analyses and forecasting targets
 
+---
 
 # olist_products_dataset.csv ('products')
-dataset containing information about products (category, wight, description, ...)
+dataset containing information about products (category, weight, description, ...)
 - **Grain**: one row per product id
 - **Shape**: (32951, 9)
 - **Approx Memory**: ~2.3 MB
@@ -332,6 +338,7 @@ dataset containing information about products (category, wight, description, ...
   - group rare categories,
   - or use target encoding / embeddings rather than one-hot encoding
 
+---
 
 # olist_sellers_dataset.csv ('sellers')
 dataset containing sellers information (id, zip prefix, city, state)
@@ -380,6 +387,7 @@ dataset containing sellers information (id, zip prefix, city, state)
 - Only **23** of the **27** Brazilian states present in `customers` / `geolocation` appear for sellers: some states have buyers but no sellers in this dataset
 - City names will have the same normalization issues as `customer_city` / `geolocation_city` (accents, casing); we will normalize them when needed
 
+---
 
 # olist_category_name_translation.csv ('categories')
 Dataset containing the names for product categories in Portuguese and English
@@ -402,6 +410,7 @@ Dataset containing the names for product categories in Portuguese and English
   a small number of categories in `products` have no English translation here and
   will need special handling (e.g. keep original name or map to `"unknown"`)
 
+---
 
 # Relationship overview
 
@@ -409,13 +418,13 @@ Dataset containing the names for product categories in Portuguese and English
 
 - **Customer side**:
     - `customers` &harr; `orders` via (`customer_id`)
-    - `customers` &harr; `geolocation` via (`*_zip_code_prefix`) 
+    - `customers` &harr; `geolocation` via (`*_zip_code_prefix`) (after aggregating `geolocation` at ZIP-prefix level)
 
 - **Items/Products/Sellers**:
     - `items` &harr; `orders` via (`order_id`)
     - `items` &harr; `products` via (`product_id`)
     - `items` &harr; `sellers` via (`seller_id`)
-    - `products` &harr; `categories` via (`prduct_category_name`)
+    - `products` &harr; `categories` via (`product_category_name`)
     - `sellers` &harr; `geolocation` via (`*_zip_code_prefix`)
 
 - **Payments and Reviews**:

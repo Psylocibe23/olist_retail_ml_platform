@@ -432,3 +432,5 @@ Dataset containing the names for product categories in Portuguese and English
     - `reviews` &harr; `orders` via (`order_id`)
 
 ![Olist schema diagram](../docs/olist_schema.png)
+
+*Figure 1 – ER diagram for the Olist dataset (source: “Brazilian E-Commerce Public Dataset by Olist” on Kaggle).*

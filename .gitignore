@@ -5,3 +5,4 @@ venv_ml/
 
 data/raw/
 data/processed/
+.env

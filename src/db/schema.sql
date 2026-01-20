@@ -27,6 +27,21 @@ CREATE TABLE IF NOT EXISTS categories (
     product_category_name_english TEXT
 );
 
+-- products
+CREATE TABLE IF NOT EXISTS products (
+    product_id TEXT PRIMARY KEY,
+    product_category_name TEXT,
+    product_name_lenght INTEGER,
+    product_description_lenght INTEGER,
+    product_photos_qty INTEGER,
+    product_weight_g DOUBLE PRECISION,
+    product_length_cm DOUBLE PRECISION,
+    product_height_cm DOUBLE PRECISION,
+    product_width_cm DOUBLE PRECISION,
+    CONSTRAINT fk_products_category
+        FOREIGN KEY (product_category_name) REFERENCES categories(product_category_name)
+);
+
 -- sellers
 CREATE TABLE IF NOT EXISTS sellers (
     seller_id TEXT PRIMARY KEY,
@@ -65,21 +80,6 @@ CREATE TABLE IF NOT EXISTS items (
         FOREIGN KEY (seller_id) REFERENCES sellers(seller_id),
     CONSTRAINT fk_items_products 
         FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
-
--- products
-CREATE TABLE IF NOT EXISTS products (
-    product_id TEXT PRIMARY KEY,
-    product_category_name TEXT,
-    product_name_lenght INTEGER,
-    product_description_lenght INTEGER,
-    product_photos_qty INTEGER,
-    product_weight_g DOUBLE PRECISION,
-    product_length_cm DOUBLE PRECISION,
-    product_height_cm DOUBLE PRECISION,
-    product_width_cm DOUBLE PRECISION,
-    CONSTRAINT fk_products_category
-        FOREIGN KEY (product_category_name) REFERENCES categories(product_category_name)
 );
 
 -- payments

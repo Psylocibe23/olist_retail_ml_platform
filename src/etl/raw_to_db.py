@@ -101,9 +101,24 @@ def load_orders(engine: Engine, data_dir: Path = RAW_DATA_DIRECTORY) -> None:
 def load_products(engine: Engine, data_dir: Path = RAW_DATA_DIRECTORY) -> None:
     """
     Loads olits_products_dataset.csv -> products table.
+    Ensures that product_category_name values respect the FK to categories (2 missing category names in products table).
     """
     csv_path = data_dir / "olist_products_dataset.csv"
     df = pd.read_csv(csv_path)
+
+    # Get list of valid product category names
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT product_category_name FROM categories"))
+        valid_categories = {row[0] for row in result}  # Set of category names
+    
+    # For products with category names not present in categories set product_category_name to NULL
+    mask_invalid = ~df["product_category_name"].isin(valid_categories) & df["product_category_name"].notna()
+    n_invalid = int(mask_invalid.sum())
+    if n_invalid > 0:
+        print(f"[WARN] {n_invalid} products with unmapped category; setting product_category_name to NULL")
+        df.loc[mask_invalid, "product_category_name"] = None
+
+
     df.to_sql("products", engine, if_exists="append", index=False, method="multi")
     _log_loaded("products", df)
 

@@ -108,6 +108,13 @@ CREATE TABLE IF NOT EXISTS reviews (
         FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
+-- -----------------------
+-- Extensions
+-- -----------------------
+
+-- Enable unaccent extension for text normalization
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
 
 -- -----------------------
 -- Model Tracking Tables

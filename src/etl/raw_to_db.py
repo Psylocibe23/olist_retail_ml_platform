@@ -2,6 +2,7 @@ from __future__ import annotations
 import pandas as pd
 from pathlib import Path
 from sqlalchemy.engine import Engine
+from sqlalchemy import text
 from src.db.engine import get_engine
 
 
